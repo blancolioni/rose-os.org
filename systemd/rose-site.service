@@ -1,0 +1,7 @@
+[Unit]
+Description=Regenerate the rose-os.org landing page
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=%h/rose-site/update-site.py

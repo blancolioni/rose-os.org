@@ -1,0 +1,6 @@
+# Output of trial runs and previews
+preview/
+staging/
+# The page this site replaced, kept as a local backup
+index.html.before-landing-page
+__pycache__/
