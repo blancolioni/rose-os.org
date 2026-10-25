@@ -34,3 +34,7 @@ systemctl --user enable --now rose-site.timer
 Lingering must be on (`loginctl enable-linger`) for the timer to run while you are logged out. `journalctl --user -u rose-site.service` shows the output of each run.
 
 Changes to `src/index.html` are published by the next run, or at once with `systemctl --user start rose-site.service`.
+
+## Licence
+
+GNU General Public License v3, the same as Rose; see `LICENSE`.
