@@ -6,10 +6,10 @@ The landing page for [Rose](https://github.com/blancolioni/rose), a persistent, 
 
 - `src/index.html`: the page. It is a fragment (title, styles and `<main>`), so it can also be previewed as a Claude artifact. The generator adds the document wrapper.
 - `src/rose.jpg`: the rose photo, from `icons/rose-small.png` in the Rose repository.
-- `update-site.py`: fills in the "Recently merged" list with the last five pull requests merged into blancolioni/rose, and writes `index.html` and `rose.jpg` to the web root.
+- `update-site.py`: fills in the "Recently merged" list with the last five pull requests merged into blancolioni/rose, and the download button with the size of the published ISO, and writes `index.html` and `rose.jpg` to the web root.
 - `systemd/`: a user service and timer that run the generator every 15 minutes.
 
-The Rose Book (`/rose-book/`) and the ISO (`/rose.iso`) are published separately, from the Rose repository.
+The Rose Book (`/rose-book/`) and the ISO (`/rose.iso`) are published separately, from the Rose repository: the book by `make` in `doc/rose-book`, and the ISO by `make publish-iso`.
 
 ## Running
 
