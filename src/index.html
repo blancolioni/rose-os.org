@@ -243,6 +243,8 @@ blockquote cite { font-family: var(--mono); font-style: normal; font-size: 0.75r
 .work ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.8rem; }
 .work li { display: grid; grid-template-columns: 4.5rem 1fr; gap: 0.75rem; border-top: 1px solid var(--rule); padding-top: 0.8rem; }
 .work li a.issue { font-family: var(--mono); font-size: 0.85rem; text-decoration: none; }
+.work ul + h3 { margin-top: 1rem; }
+.work code { font-family: var(--mono); font-size: 0.9em; }
 
 .merged-block { display: grid; gap: 1rem; }
 .merged-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.5rem 1.5rem; }
@@ -306,7 +308,7 @@ footer {
       <p class="lead">
         Rose is a small kernel and a set of user-space servers.
         Every process acts only through the capabilities it holds, and the system is built to keep its state across restarts.
-        It runs on i686 under QEMU, boots to the Petal shell, and is very much a work in progress.
+        It runs on i686 under QEMU, boots to the Petal shell, comes back from its last checkpoint when restarted, and is very much a work in progress.
       </p>
       <div class="actions">
         <a class="button primary" href="/rose-book/">Read the Rose Book</a>
@@ -349,8 +351,8 @@ footer {
         <h3>Persistence</h3>
         <p>
           Rose is designed to keep running across restarts.
-          Checkpoints save the system's page objects to disk, and a restore brings back the latest consistent one, with processes keeping the capabilities they held.
-          The checkpoint and restore servers exist; restoring every process is still being built.
+          Every 30 seconds a checkpoint saves the kernel's tables and every changed page to a log on disk.
+          At the next boot, a restore brings back every persistent process as it was at the last checkpoint, with the capabilities it held and the screen it had drawn.
         </p>
       </article>
       <article class="idea">
@@ -423,11 +425,18 @@ footer {
         <cite>The README</cite>
       </blockquote>
       <div class="work">
+        <h3>Working now</h3>
+        <ul>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/pull/255">#255</a><span>Restoring the whole system from its last checkpoint at boot</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/pull/304">#304</a><span>A console whose screen survives a restore</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/222">#222</a><span>Users, directories and files, each directory and file served by its own process; a first user with a home directory</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/pull/313">#313</a><span>Petal runs the user's <code>.petalrc</code> at start, and <code>list</code> shows a directory's entries</span></li>
+        </ul>
         <h3>Current work</h3>
         <ul>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/138">#138</a><span>Typed commands declared in IDL, and the Petal shell launching them</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/pull/328">#328</a><span>Installing from the ISO, then booting from the hard disk with only the servers that persistence itself needs</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/322">#322</a><span>Booting Rose from the hard disk instead of the ISO</span></li>
           <li><a class="issue" href="https://github.com/blancolioni/rose/issues/116">#116</a><span>Revoking capabilities per grant, with membranes for whole jobs</span></li>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/114">#114</a><span>Restoring pages and processes from a checkpoint</span></li>
           <li><a class="issue" href="https://github.com/blancolioni/rose/issues/147">#147</a><span>Bringing the Rose Book up to date</span></li>
         </ul>
       </div>
