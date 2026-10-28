@@ -3,7 +3,8 @@
 
 Fills the "Recently merged" list in src/index.html with the last few
 pull requests merged into blancolioni/rose, and the download button
-with the size of the published ISO, then writes the page and
+with the version and size of the published ISO, then writes the
+page and
 its image to OUTDIR.  src/index.html is a page fragment (title, styles
 and <main>), so the same file can be previewed as a Claude artifact;
 this script adds the document wrapper.
@@ -37,6 +38,10 @@ SRC = os.path.join(HERE, "src")
 # Published from the Rose repository ("make publish-iso"), not by this
 # script; its size goes on the download button.
 ISO = "/var/www/rose-os.org/html/rose.iso"
+# Written next to the ISO by "make publish-iso": the ISO's Rose
+# version, such as 0.2.0, which goes on the download button before
+# its size.
+ISO_VERSION = ISO + ".version"
 
 
 def merged_prs():
@@ -113,6 +118,12 @@ def main():
     if os.path.exists(ISO):
         megabytes = round(os.path.getsize(ISO) / 2 ** 20)
         page = fill(page, "isosize", f"{megabytes} MB")
+    if os.path.exists(ISO_VERSION):
+        with open(ISO_VERSION, encoding="utf-8") as f:
+            version = f.read().strip()
+        if version:
+            page = fill(page, "isoversion",
+                        f"{html.escape(version)} · ")
 
     os.makedirs(args.outdir, exist_ok=True)
     if args.fragment:
