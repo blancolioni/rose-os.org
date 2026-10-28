@@ -4,10 +4,9 @@
 Fills the "Recently merged" list in src/index.html with the last few
 pull requests merged into blancolioni/rose, and the download button
 with the version and size of the published ISO, then writes the
-page and
-its image to OUTDIR.  src/index.html is a page fragment (title, styles
-and <main>), so the same file can be previewed as a Claude artifact;
-this script adds the document wrapper.
+page, its image and its icons to OUTDIR.  src/index.html is a page
+fragment (title, styles and <main>), so the same file can be previewed
+as a Claude artifact; this script adds the document wrapper.
 
 Usage: update-site.py [--fragment] [OUTDIR]
 
@@ -35,6 +34,8 @@ COUNT = 5
 BASES = ("main", "master")
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "src")
+# Copied beside the page as they are.
+ASSETS = ("rose.jpg", "favicon.svg", "apple-touch-icon.png")
 # Published from the Rose repository ("make publish-iso"), not by this
 # script; its size goes on the download button.
 ISO = "/var/www/rose-os.org/html/rose.iso"
@@ -131,12 +132,13 @@ def main():
     else:
         write_atomic(os.path.join(args.outdir, "index.html"), wrap(page))
 
-    image = os.path.join(SRC, "rose.jpg")
-    target = os.path.join(args.outdir, "rose.jpg")
-    if not os.path.exists(target) or not filecmp.cmp(image, target,
-                                                      shallow=False):
-        shutil.copyfile(image, target)
-        os.chmod(target, 0o644)
+    for name in ASSETS:
+        source = os.path.join(SRC, name)
+        target = os.path.join(args.outdir, name)
+        if not os.path.exists(target) or not filecmp.cmp(source, target,
+                                                          shallow=False):
+            shutil.copyfile(source, target)
+            os.chmod(target, 0o644)
 
 
 if __name__ == "__main__":
