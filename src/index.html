@@ -245,6 +245,9 @@ blockquote cite { font-family: var(--mono); font-style: normal; font-size: 0.75r
 .work ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.8rem; }
 .work li { display: grid; grid-template-columns: 4.5rem 1fr; gap: 0.75rem; border-top: 1px solid var(--rule); padding-top: 0.8rem; }
 .work li a.issue { font-family: var(--mono); font-size: 0.85rem; text-decoration: none; }
+.work ul.projects li { grid-template-columns: 1fr; gap: 0.2rem; }
+.work li a.project { font-weight: 600; text-decoration: none; }
+.work li a.project + span:empty { display: none; }
 .work ul + h3 { margin-top: 1rem; }
 .work code { font-family: var(--mono); font-size: 0.9em; }
 
@@ -435,11 +438,8 @@ footer {
           <li><a class="issue" href="https://github.com/blancolioni/rose/pull/313">#313</a><span>Petal runs the user's <code>.petalrc</code> at start, and <code>list</code> shows a directory's entries</span></li>
         </ul>
         <h3>Current work</h3>
-        <ul>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/pull/328">#328</a><span>Installing from the ISO, then booting from the hard disk with only the servers that persistence itself needs</span></li>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/322">#322</a><span>Booting Rose from the hard disk instead of the ISO</span></li>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/116">#116</a><span>Revoking capabilities per grant, with membranes for whole jobs</span></li>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/147">#147</a><span>Bringing the Rose Book up to date</span></li>
+        <ul class="projects">
+          <!-- projects:start --><!-- projects:end -->
         </ul>
       </div>
     </div>
