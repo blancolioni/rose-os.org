@@ -2,7 +2,8 @@
 """Regenerate the rose-os.org landing page.
 
 Fills the "Recently merged" list in src/index.html with the last few
-pull requests merged into blancolioni/rose, and the download button
+pull requests merged into blancolioni/rose, the "Current work" list
+with the most recently updated public projects, and the download button
 with the version and size of the published ISO, then writes the
 page, its image and its icons to OUTDIR.  src/index.html is a page
 fragment (title, styles and <main>), so the same file can be previewed
@@ -29,6 +30,10 @@ import tempfile
 
 REPO = "blancolioni/rose"
 COUNT = 5
+OWNER = "blancolioni"
+# Projects are private unless made public, so only the public ones are
+# Rose's: the others are unrelated, or not ready to show.
+PROJECT_COUNT = 4
 # The default branch was renamed from master to main; merged pull
 # requests keep the base they had.
 BASES = ("main", "master")
@@ -57,12 +62,39 @@ def merged_prs():
     return prs[:COUNT]
 
 
+def recent_projects():
+    query = """
+    query($owner: String!) {
+      user(login: $owner) {
+        projectsV2(first: 30,
+                   orderBy: {field: UPDATED_AT, direction: DESC}) {
+          nodes { title shortDescription url closed public }
+        }
+      }
+    }"""
+    result = subprocess.run(
+        ["gh", "api", "graphql", "-f", f"query={query}",
+         "-f", f"owner={OWNER}"],
+        check=True, capture_output=True, text=True)
+    nodes = json.loads(result.stdout)["data"]["user"]["projectsV2"]["nodes"]
+    return [project for project in nodes
+            if project["public"] and not project["closed"]][:PROJECT_COUNT]
+
+
 def parse_time(stamp):
     return datetime.datetime.strptime(stamp, "%Y-%m-%dT%H:%M:%SZ")
 
 
 def day(when):
     return f"{when.day} {when:%b %Y}"
+
+
+def render_project(project):
+    description = project["shortDescription"] or ""
+    return (f'          <li><a class="project" '
+            f'href="{html.escape(project["url"])}">'
+            f'{html.escape(project["title"])}</a>'
+            f'<span>{html.escape(description)}</span></li>\n')
 
 
 def render_pr(pr):
@@ -115,6 +147,8 @@ def main():
     now = datetime.datetime.now(datetime.timezone.utc)
     items = "".join(render_pr(pr) for pr in merged_prs())
     page = fill(page, "merged", "\n" + items)
+    projects = "".join(render_project(p) for p in recent_projects())
+    page = fill(page, "projects", "\n" + projects + "          ")
     page = fill(page, "updated", f"Updated {day(now)}, {now:%H:%M} UTC")
     if os.path.exists(ISO):
         megabytes = round(os.path.getsize(ISO) / 2 ** 20)
