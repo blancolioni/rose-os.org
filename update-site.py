@@ -40,7 +40,7 @@ BASES = ("main", "master")
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "src")
 # Copied beside the page as they are.
-ASSETS = ("rose.jpg", "favicon.svg", "apple-touch-icon.png")
+ASSETS = ("rose.jpg", "rose-disc.webp", "favicon.svg", "apple-touch-icon.png")
 # Published from the Rose repository ("make publish-iso"), not by this
 # script; its size goes on the download button.
 ISO = "/var/www/rose-os.org/html/rose.iso"

@@ -136,6 +136,18 @@ p { margin: 0; }
 .button.primary { background: var(--rose); border-color: var(--rose); color: var(--paper); }
 .button.primary:hover { filter: brightness(1.08); color: var(--paper); }
 .button small { font-family: var(--mono); font-size: 0.75rem; opacity: 0.75; }
+.disc {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: fit-content;
+  color: var(--muted);
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+.disc img { display: block; width: 8rem; height: auto; flex: none; }
+.disc:hover { color: var(--rose); }
+.disc:hover img { filter: brightness(1.04); }
 
 /* Specimen plate */
 .plate {
@@ -320,6 +332,10 @@ footer {
         <a class="button" href="https://github.com/blancolioni/rose">Source on GitHub</a>
         <a class="button" href="/rose.iso">Download ISO <small><!-- isoversion:start --><!-- isoversion:end --><!-- isosize:start -->34 MB<!-- isosize:end --></small></a>
       </div>
+      <a class="disc" href="/rose.iso">
+        <img src="rose-disc.webp" width="320" height="308" alt="A CD-ROM printed with the Rose logo and a red rose, labelled Bootable Installation CD-ROM">
+        <span>The installation CD-ROM, as a bootable ISO.</span>
+      </a>
     </div>
 
     <figure class="plate">
