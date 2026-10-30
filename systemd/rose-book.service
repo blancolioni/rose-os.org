@@ -1,0 +1,9 @@
+[Unit]
+Description=Rebuild and publish the Rose Book from Rose's main branch
+After=network-online.target
+
+[Service]
+Type=oneshot
+# asciidoctor-epub3 is a gem, installed in ~/bin
+Environment=PATH=%h/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=%h/rose-site/update-book.sh
