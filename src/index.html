@@ -146,6 +146,7 @@ p { margin: 0; }
   text-decoration: none;
 }
 .disc img { display: block; width: 8rem; height: auto; flex: none; }
+.disc small { font-family: var(--mono); font-size: 0.75rem; opacity: 0.75; }
 .disc:hover { color: var(--rose); }
 .disc:hover img { filter: brightness(1.04); }
 
@@ -193,54 +194,14 @@ p { margin: 0; }
 .idea .label { color: var(--stem); }
 section { display: grid; gap: 2rem; }
 
-/* Anatomy */
-.anatomy-intro { display: grid; gap: 0.75rem; max-width: 62ch; }
-.diagram-scroll { overflow-x: auto; }
-.diagram { min-width: 600px; font-family: var(--mono); font-size: 0.8rem; }
-.bits, .word {
-  display: grid;
-  grid-template-columns: 3.5rem repeat(32, minmax(0, 1fr));
-}
-.bits span { color: var(--muted); font-size: 0.7rem; padding-bottom: 0.25rem; font-variant-numeric: tabular-nums; }
-.bits .hi { text-align: left; }
-.bits .lo { text-align: right; }
-.word .off {
-  color: var(--muted);
-  font-variant-numeric: tabular-nums;
-  align-self: center;
-}
-.f {
-  border: 1px solid var(--ink);
-  margin: 0 0 -1px -1px;
-  background: var(--field);
-  min-height: 2.6rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 0.2rem;
-  line-height: 1.2;
-}
-.f.tint { background: var(--field-tint); }
-.f.tall { min-height: 4.2rem; }
-.fields {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.6rem 2.5rem;
-  margin: 0;
-  max-width: 62rem;
-}
-.fields div { display: grid; grid-template-columns: 9.5rem 1fr; gap: 1rem; border-top: 1px solid var(--rule); padding-top: 0.6rem; min-width: 0; }
-.fields dt { font-family: var(--mono); font-size: 0.85rem; color: var(--rose); }
-.fields dd { margin: 0; }
-
 /* Status */
 .status {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  gap: 3rem;
+  gap: 2.5rem 3rem;
   align-items: start;
 }
+.status blockquote { grid-column: 1 / -1; max-width: 46rem; }
 blockquote {
   margin: 0;
   font-family: var(--display);
@@ -260,7 +221,6 @@ blockquote cite { font-family: var(--mono); font-style: normal; font-size: 0.75r
 .work ul.projects li { grid-template-columns: 1fr; gap: 0.2rem; }
 .work li a.project { font-weight: 600; text-decoration: none; }
 .work li a.project + span:empty { display: none; }
-.work ul + h3 { margin-top: 1rem; }
 .work code { font-family: var(--mono); font-size: 0.9em; }
 
 .merged-block { display: grid; gap: 1rem; }
@@ -300,13 +260,8 @@ footer {
   .plate { justify-self: start; }
   .ideas { grid-template-columns: 1fr; gap: 2rem; }
   .status { grid-template-columns: 1fr; }
-  .fields { grid-template-columns: 1fr; }
   .page { gap: 4rem; padding-block: 2rem 3rem; }
 }
-@media (max-width: 420px) {
-  .fields div { grid-template-columns: 1fr; gap: 0.2rem; }
-}
-
 @media (prefers-reduced-motion: no-preference) {
   .hero h1 { animation: bloom 0.9s ease-out both; }
   .plate { animation: settle 1.1s 0.15s ease-out both; }
@@ -329,12 +284,13 @@ footer {
       </p>
       <div class="actions">
         <a class="button primary" href="/rose-book/">Read the Rose Book</a>
+        <a class="button" href="/rose-book/rose-book.pdf">Rose Book PDF</a>
+        <a class="button" href="/rose-book/rose-book.epub">Rose Book EPUB</a>
         <a class="button" href="https://github.com/blancolioni/rose">Source on GitHub</a>
-        <a class="button" href="/rose.iso">Download ISO <small><!-- isoversion:start --><!-- isoversion:end --><!-- isosize:start -->34 MB<!-- isosize:end --></small></a>
       </div>
       <a class="disc" href="/rose.iso">
         <img src="rose-disc.webp" width="320" height="308" alt="A CD-ROM printed with the Rose logo and a red rose, labelled Bootable Installation CD-ROM">
-        <span>The installation CD-ROM, as a bootable ISO.</span>
+        <span>Download the installation CD image <small><!-- isoversion:start --><!-- isoversion:end --><!-- isosize:start -->34 MB<!-- isosize:end --></small></span>
       </a>
     </div>
 
@@ -387,54 +343,6 @@ footer {
     </div>
   </section>
 
-  <section aria-labelledby="anatomy-title">
-    <div class="anatomy-intro">
-      <p class="label">Inside the kernel</p>
-      <h2 id="anatomy-title">Anatomy of a capability</h2>
-      <p>
-        Behind each capability word is a 16-byte structure in the kernel.
-        This is the generic layout; the diagram in the Rose Book is generated from the same description, and the build checks it against the Ada record.
-      </p>
-    </div>
-
-    <div class="diagram-scroll">
-      <div class="diagram" role="img" aria-label="Capability layout: word 0 holds Rescinded Count in bits 31 to 8, then X, W, R and S flags in bits 7 to 4, and Type in bits 3 to 0. Word 1 holds Identifier in bits 31 to 16 and Endpoint in bits 15 to 0. Words 2 and 3 hold a 64-bit Payload.">
-        <div class="bits" aria-hidden="true">
-          <span></span>
-          <span class="hi" style="grid-column: 2 / span 12">31</span>
-          <span class="lo" style="grid-column: 14 / span 12">8</span>
-          <span class="lo">7</span><span class="lo">6</span><span class="lo">5</span><span class="lo">4</span>
-          <span class="hi" style="grid-column: 30 / span 2">3</span>
-          <span class="lo" style="grid-column: 32 / span 2">0</span>
-        </div>
-        <div class="word">
-          <span class="off">+0</span>
-          <span class="f tint" style="grid-column: span 24">Rescinded Count</span>
-          <span class="f">X</span><span class="f">W</span><span class="f">R</span><span class="f">S</span>
-          <span class="f tint" style="grid-column: span 4">Type</span>
-        </div>
-        <div class="word">
-          <span class="off">+4</span>
-          <span class="f" style="grid-column: span 16">Identifier</span>
-          <span class="f" style="grid-column: span 16">Endpoint</span>
-        </div>
-        <div class="word">
-          <span class="off">+8</span>
-          <span class="f tall" style="grid-column: span 32">Payload (64 bits), often an object id</span>
-        </div>
-      </div>
-    </div>
-
-    <dl class="fields">
-      <div><dt>Type</dt><dd>What the capability names: a page object, a process, an endpoint, a set, a kernel service.</dd></div>
-      <div><dt>S R W X</dt><dd>Single use, and read, write and execute access to the resource.</dd></div>
-      <div><dt>Rescinded Count</dt><dd>How often the capability has been rescinded. It must match whenever the capability is invoked.</dd></div>
-      <div><dt>Endpoint</dt><dd>Which of the receiving object's endpoints the invocation reaches.</dd></div>
-      <div><dt>Identifier</dt><dd>A value handed to the receiving object, so it can tell its callers apart.</dd></div>
-      <div><dt>Payload</dt><dd>Type-specific data, usually the object id.</dd></div>
-    </dl>
-  </section>
-
   <section aria-labelledby="status-title">
     <div class="ideas-head">
       <p class="label">Where it stands</p>
@@ -448,11 +356,13 @@ footer {
       <div class="work">
         <h3>Working now</h3>
         <ul>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/pull/255">#255</a><span>Restoring the whole system from its last checkpoint at boot</span></li>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/pull/304">#304</a><span>A console whose screen survives a restore</span></li>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/222">#222</a><span>Users, directories and files, each directory and file served by its own process; a first user with a home directory</span></li>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/pull/313">#313</a><span>Petal runs the user's <code>.petalrc</code> at start, and <code>list</code> shows a directory's entries</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/pull/502">#502</a><span>Logging users in at the console, with Petal as a command</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/pull/510">#510</a><span>Restarting and booting from the hard disk when the install finishes</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/pull/493">#493</a><span>A userland runtime, so servers can use Ada containers and run as ordinary processes</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/518">#518</a><span>Saving banks in the checkpoint, so limits and charges survive a restore</span></li>
         </ul>
+      </div>
+      <div class="work">
         <h3>Current work</h3>
         <ul class="projects">
           <!-- projects:start --><!-- projects:end -->
