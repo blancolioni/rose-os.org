@@ -5,6 +5,8 @@ set -eu
 log=/var/log/nginx/rose-os.org.log
 out=${1:-$HOME/rose-stats}
 
+[ -r "$log" ] || { echo "update-stats.sh: cannot read $log" >&2; exit 1; }
+
 mkdir -p "$out"
 
 {
