@@ -1,0 +1,6 @@
+[Unit]
+Description=Build the rose-os.org visitor report
+
+[Service]
+Type=oneshot
+ExecStart=%h/rose-site/update-stats.sh
