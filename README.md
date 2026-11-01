@@ -9,7 +9,8 @@ The landing page for [Rose](https://github.com/blancolioni/rose), a persistent, 
 - `src/rose-disc.webp`: the label art for the installation CD-ROM, the link to the ISO download, with its version and size beside it; 320 px wide, with a transparent background.
 - `update-site.py`: fills in the "Recently merged" list with the last five pull requests merged into blancolioni/rose, and the ISO download link with the version and size of the published ISO (`rose.iso.version`, written by `make publish-iso`), and writes `index.html` and `rose.jpg` to the web root.
 - `update-book.sh`: keeps its own clone of Rose at `~/rose-book-src`, tracking `main`. When `main` has moved, it builds the Rose Book (`make adoc` in `doc/rose-book`) and publishes the HTML, PDF and EPUB to `/rose-book/`. Branches and worktrees never reach the website.
-- `systemd/`: user services and timers that run the generator and the book updater every 15 minutes.
+- `update-stats.sh`: builds a visitor report with GoAccess from `/var/log/nginx/rose-os.org.log` and its rotated copies, and writes it to `~/rose-stats/index.html`, outside the web root. IP addresses are anonymised; crawlers, 404s and query strings are left out.
+- `systemd/`: user services and timers that run the generator and the book updater every 15 minutes, and the stats report every hour.
 
 The ISO (`/rose.iso`) is published separately, from the Rose repository, by `make publish-iso`.
 
@@ -44,6 +45,16 @@ cp systemd/rose-book.service systemd/rose-book.timer ~/.config/systemd/user/
 systemctl --user daemon-reload
 systemctl --user enable --now rose-book.timer
 ```
+
+The stats timer needs `goaccess`, and read access to `/var/log/nginx`: the user must be in the group that owns the logs (`weblogs`), and `/etc/logrotate.d/nginx` must create new logs with that group (`create 0640 nginx weblogs`). nginx writes the site's own log, set in its server block with `access_log /var/log/nginx/rose-os.org.log main;`.
+
+```sh
+cp systemd/rose-stats.service systemd/rose-stats.timer ~/.config/systemd/user/
+systemctl --user daemon-reload
+systemctl --user enable --now rose-stats.timer
+```
+
+The report is private; copy it with `scp thewhitelion.eu:rose-stats/index.html .`. A user service only sees a group added after login once the user manager restarts, so if the first run says "Permission denied", run `loginctl terminate-user fraser` and log in again.
 
 ## Licence
 
