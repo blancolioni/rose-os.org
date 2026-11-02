@@ -3,6 +3,7 @@ Description=Regenerate the rose-os.org landing page every 15 minutes
 
 [Timer]
 OnBootSec=2min
+OnActiveSec=1min
 OnUnitActiveSec=15min
 Persistent=true
 
