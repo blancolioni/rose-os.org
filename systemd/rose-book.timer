@@ -3,6 +3,7 @@ Description=Check every 15 minutes for a new Rose Book
 
 [Timer]
 OnBootSec=5min
+OnActiveSec=1min
 OnUnitActiveSec=15min
 Persistent=true
 
