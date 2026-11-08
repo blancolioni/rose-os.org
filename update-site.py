@@ -6,7 +6,8 @@ last closed as completed in the current milestone of blancolioni/rose
 (the open milestone with the lowest version), with its progress, and
 the download button with the version and size of the published ISO,
 then writes the
-page, its image and its icons to OUTDIR.  src/index.html is a page
+page, its image and its icons to OUTDIR.  It also writes feed.xml
+there, an Atom feed of the pull requests last merged into main.  src/index.html is a page
 fragment (title, styles and <main>), so the same file can be previewed
 as a Claude artifact; this script adds the document wrapper.
 
@@ -31,6 +32,11 @@ import tempfile
 
 REPO = "blancolioni/rose"
 COUNT = 5
+FEED_COUNT = 20
+FEED_URL = "https://rose-os.org/feed.xml"
+# The default branch was renamed from master to main; merged pull
+# requests keep the base they had.
+BASES = ("main", "master")
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "src")
 # Copied beside the page as they are.
@@ -80,6 +86,63 @@ def resolved_issues(milestone):
     return issues[:COUNT]
 
 
+def merged_prs():
+    # Merging a pull request updates it, so the most recently merged
+    # ones are among the most recently updated.
+    prs = [pr for pr in gh_api(f"repos/{REPO}/pulls?state=closed"
+                               f"&sort=updated&direction=desc&per_page=100")
+           if pr["merged_at"] and pr["base"]["ref"] in BASES]
+    prs.sort(key=lambda pr: pr["merged_at"], reverse=True)
+    return prs[:FEED_COUNT]
+
+
+def summary(body):
+    """The first paragraph of prose in a pull request's description, as
+    plain text: headings, lists and "Closes #N." lines are skipped."""
+    text = (body or "").replace("\r\n", "\n")
+    for paragraph in text.split("\n\n"):
+        lines = [line for line in paragraph.strip().splitlines()
+                 if not line.startswith("#")]
+        prose = " ".join(" ".join(lines).split())
+        if (not prose or prose.startswith(("- ", "* ", "|", "```"))
+                or re.fullmatch(r"(?i)((closes|fixes|resolves) #\d+\.?\s*)+",
+                                prose)):
+            continue
+        prose = re.sub(r"\[([^\]]*)\]\([^)]*\)", r"\1", prose)
+        return re.sub(r"\*\*|`", "", prose)
+    return ""
+
+
+def render_entry(pr):
+    return (f'  <entry>\n'
+            f'    <title>#{pr["number"]} {html.escape(pr["title"])}</title>\n'
+            f'    <link href="{html.escape(pr["html_url"])}"/>\n'
+            f'    <id>{html.escape(pr["html_url"])}</id>\n'
+            f'    <updated>{pr["merged_at"]}</updated>\n'
+            f'    <author><name>{html.escape(pr["user"]["login"])}</name>'
+            f'</author>\n'
+            f'    <summary>{html.escape(summary(pr["body"]))}</summary>\n'
+            f'  </entry>\n')
+
+
+def feed(prs):
+    # The feed's time is its newest entry's, so the file only changes
+    # when something is merged.
+    updated = prs[0]["merged_at"] if prs else "1970-01-01T00:00:00Z"
+    return ('<?xml version="1.0" encoding="utf-8"?>\n'
+            '<feed xmlns="http://www.w3.org/2005/Atom">\n'
+            '  <title>Rose: merged pull requests</title>\n'
+            '  <subtitle>Pull requests merged into the Rose operating '
+            'system</subtitle>\n'
+            f'  <link rel="self" href="{FEED_URL}"/>\n'
+            f'  <link rel="alternate" href="https://github.com/{REPO}/pulls'
+            f'?q=is%3Apr+is%3Amerged"/>\n'
+            f'  <id>{FEED_URL}</id>\n'
+            f'  <updated>{updated}</updated>\n'
+            + "".join(render_entry(pr) for pr in prs)
+            + '</feed>\n')
+
+
 def day(when):
     return f"{when.day} {when:%b %Y}"
 
@@ -110,6 +173,14 @@ def wrap(fragment):
             "<meta name=\"viewport\" "
             "content=\"width=device-width, initial-scale=1\">\n"
             f"{head}</head>\n<body>\n<main{body}</body>\n</html>\n")
+
+
+def write_if_changed(path, text):
+    if os.path.exists(path):
+        with open(path, encoding="utf-8") as f:
+            if f.read() == text:
+                return
+    write_atomic(path, text)
 
 
 def write_atomic(path, text):
@@ -157,6 +228,8 @@ def main():
         write_atomic(os.path.join(args.outdir, "index.html"), page)
     else:
         write_atomic(os.path.join(args.outdir, "index.html"), wrap(page))
+    write_if_changed(os.path.join(args.outdir, "feed.xml"),
+                     feed(merged_prs()))
 
     for name in ASSETS:
         source = os.path.join(SRC, name)
