@@ -218,31 +218,10 @@ blockquote cite { font-family: var(--mono); font-style: normal; font-size: 0.75r
 .work ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.8rem; }
 .work li { display: grid; grid-template-columns: 4.5rem 1fr; gap: 0.75rem; border-top: 1px solid var(--rule); padding-top: 0.8rem; }
 .work li a.issue { font-family: var(--mono); font-size: 0.85rem; text-decoration: none; }
-.work ul.projects li { grid-template-columns: 1fr; gap: 0.2rem; }
-.work li a.project { font-weight: 600; text-decoration: none; }
-.work li a.project + span:empty { display: none; }
 .work code { font-family: var(--mono); font-size: 0.9em; }
-
-.merged-block { display: grid; gap: 1rem; }
-.merged-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 0.5rem 1.5rem; }
-.merged-head .updated { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); }
-.merged { list-style: none; margin: 0; padding: 0; display: grid; }
-.merged li {
-  display: grid;
-  grid-template-columns: 7.5rem 4.5rem minmax(0, 1fr);
-  gap: 0.75rem;
-  align-items: baseline;
-  border-top: 1px solid var(--rule);
-  padding-block: 0.7rem;
-}
-.merged li:last-child { border-bottom: 1px solid var(--rule); }
-.merged time { font-family: var(--mono); font-size: 0.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
-.merged a { font-family: var(--mono); font-size: 0.85rem; text-decoration: none; }
-.merged span { min-width: 0; overflow-wrap: anywhere; }
-@media (max-width: 560px) {
-  .merged li { grid-template-columns: 4.5rem minmax(0, 1fr); gap: 0.2rem 0.75rem; }
-  .merged time { grid-column: 1 / -1; }
-}
+.work-head { display: grid; gap: 0.3rem; }
+.work-head h3 a { text-decoration: none; }
+.work-head .meta { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); }
 
 footer {
   border-top: 1px solid var(--rule);
@@ -356,29 +335,23 @@ footer {
       <div class="work">
         <h3>Working now</h3>
         <ul>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/735">#735</a><span>A text editor, ported from kilo</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/653">#653</a><span>The console drawn on a framebuffer, with a bitmap font and a screen larger than 80x25</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/338">#338</a><span>Petal redirects output to files, and keeps a current directory with cd and pwd</span></li>
           <li><a class="issue" href="https://github.com/blancolioni/rose/pull/502">#502</a><span>Logging users in at the console, with Petal as a command</span></li>
           <li><a class="issue" href="https://github.com/blancolioni/rose/pull/510">#510</a><span>Restarting and booting from the hard disk when the install finishes</span></li>
           <li><a class="issue" href="https://github.com/blancolioni/rose/pull/493">#493</a><span>A userland runtime, so servers can use Ada containers and run as ordinary processes</span></li>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/518">#518</a><span>Saving banks in the checkpoint, so limits and charges survive a restore</span></li>
         </ul>
       </div>
       <div class="work">
-        <h3>Current work</h3>
-        <ul class="projects">
-          <!-- projects:start --><!-- projects:end -->
+        <div class="work-head">
+          <h3>Recently resolved<!-- milestone:start --><!-- milestone:end --></h3>
+          <span class="meta"><!-- progress:start --><!-- progress:end --><!-- updated:start -->Not yet updated<!-- updated:end --></span>
+        </div>
+        <ul>
+          <!-- resolved:start --><!-- resolved:end -->
         </ul>
       </div>
-    </div>
-
-    <div class="merged-block">
-      <div class="merged-head">
-        <h3>Recently merged</h3>
-        <span class="updated"><!-- updated:start -->Not yet updated<!-- updated:end --></span>
-      </div>
-      <ol class="merged">
-<!-- merged:start -->
-<!-- merged:end -->
-      </ol>
     </div>
   </section>
 
