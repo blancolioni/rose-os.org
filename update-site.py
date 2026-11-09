@@ -50,10 +50,18 @@ ISO = "/var/www/rose-os.org/html/rose.iso"
 ISO_VERSION = ISO + ".version"
 
 
-def gh_api(path):
-    result = subprocess.run(["gh", "api", path],
+def gh_api(path, paginate=False):
+    """The JSON at path. With paginate, every page of a list, as one
+    list."""
+    command = ["gh", "api", path]
+    if paginate:
+        command += ["--paginate", "--slurp"]
+    result = subprocess.run(command,
                             check=True, capture_output=True, text=True)
-    return json.loads(result.stdout)
+    data = json.loads(result.stdout)
+    if paginate:
+        data = [item for page in data for item in page]
+    return data
 
 
 def version_key(title):
@@ -73,17 +81,23 @@ def current_milestone():
                default=None)
 
 
-def resolved_issues(milestone):
-    # Closing an issue updates it, so the most recently closed ones are
-    # among the most recently updated.
-    issues = gh_api(f"repos/{REPO}/issues?milestone={milestone['number']}"
-                    f"&state=closed&sort=updated&direction=desc"
-                    f"&per_page=100")
-    issues = [issue for issue in issues
-              if "pull_request" not in issue
-              and issue.get("state_reason") == "completed"]
-    issues.sort(key=lambda issue: issue["closed_at"], reverse=True)
-    return issues[:COUNT]
+def milestone_issues(milestone):
+    """The open issues and the issues closed as completed in milestone.
+    The milestone's own counts can't be used: they include pull
+    requests, and issues closed as not planned."""
+    items = gh_api(f"repos/{REPO}/issues?milestone={milestone['number']}"
+                   f"&state=all&per_page=100", paginate=True)
+    return [item for item in items
+            if "pull_request" not in item
+            and (item["state"] == "open"
+                 or item.get("state_reason") == "completed")]
+
+
+def resolved_issues(issues):
+    """The most recently completed of issues."""
+    done = [issue for issue in issues if issue["state"] == "closed"]
+    done.sort(key=lambda issue: issue["closed_at"], reverse=True)
+    return done[:COUNT]
 
 
 def merged_prs():
@@ -204,13 +218,14 @@ def main():
     now = datetime.datetime.now(datetime.timezone.utc)
     milestone = current_milestone()
     if milestone:
-        done = milestone["closed_issues"]
-        total = done + milestone["open_issues"]
+        issues = milestone_issues(milestone)
+        done = sum(1 for issue in issues if issue["state"] == "closed")
+        total = len(issues)
         page = fill(page, "milestone",
                     f' for <a href="{html.escape(milestone["html_url"])}">'
                     f'{html.escape(milestone["title"])}</a>')
         page = fill(page, "progress", f"{done} of {total} done · ")
-        items = "".join(render_issue(i) for i in resolved_issues(milestone))
+        items = "".join(render_issue(i) for i in resolved_issues(issues))
         page = fill(page, "resolved", "\n" + items + "          ")
     page = fill(page, "updated", f"Updated {day(now)}, {now:%H:%M} UTC")
     if os.path.exists(ISO):
