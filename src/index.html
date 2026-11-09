@@ -223,6 +223,9 @@ blockquote cite { font-family: var(--mono); font-style: normal; font-size: 0.75r
 .work-head { display: grid; gap: 0.3rem; }
 .work-head h3 a { text-decoration: none; }
 .work-head .meta { font-family: var(--mono); font-size: 0.75rem; color: var(--muted); }
+.work-head .goal { margin: 0; color: var(--muted); }
+.gaps { grid-column: 1 / -1; margin: 0; border-top: 1px solid var(--rule); padding-top: 0.8rem; max-width: 46rem; }
+.gaps .label { margin-right: 0.75rem; }
 
 footer {
   border-top: 1px solid var(--rule);
@@ -335,25 +338,31 @@ footer {
         <cite>The README</cite>
       </blockquote>
       <div class="work">
-        <h3>Working now</h3>
+        <div class="work-head">
+          <h3>In <a href="https://github.com/blancolioni/rose/releases/tag/v0.3.0">0.3.0, phoebe</a></h3>
+          <p class="goal">The release with a console you can work at.</p>
+          <span class="meta">Released 9 Nov 2026</span>
+        </div>
         <ul>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/735">#735</a><span>A text editor, ported from kilo</span></li>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/653">#653</a><span>The console drawn on a framebuffer, with a bitmap font and a screen larger than 80x25</span></li>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/338">#338</a><span>Petal redirects output to files, and keeps a current directory with cd and pwd</span></li>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/pull/502">#502</a><span>Logging users in at the console, with Petal as a command</span></li>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/pull/510">#510</a><span>Restarting and booting from the hard disk when the install finishes</span></li>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/pull/493">#493</a><span>A userland runtime, so servers can use Ada containers and run as ordinary processes</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/653">#653</a><span>A framebuffer console, the default, with screens larger than 80x25</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/456">#456</a><span>Users, logins and privileges: the installer sets up the first user, and <code>sudo</code> asks for privileged roles</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/338">#338</a><span>Petal redirects output to files, and has <code>cd</code> and <code>pwd</code></span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/735">#735</a><span><code>kilo</code>, an editor, and new commands such as <code>date</code>, <code>copy</code> and <code>mkdir</code></span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/775">#775</a><span>Writing files, with versions and transactions</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/490">#490</a><span>A userland run-time system on GCC 15, with exceptions and containers</span></li>
         </ul>
       </div>
       <div class="work">
         <div class="work-head">
           <h3>Recently resolved<!-- milestone:start --><!-- milestone:end --></h3>
+          <p class="goal">Genki: stable restores, interfaces, and banks. Checkpoints from 0.4.0 will restore on every later 0.4.x.</p>
           <span class="meta"><!-- progress:start --><!-- progress:end --><!-- updated:start -->Not yet updated<!-- updated:end --></span>
         </div>
         <ul>
           <!-- resolved:start --><!-- resolved:end -->
         </ul>
       </div>
+      <p class="gaps"><span class="label">Known gaps</span> No networking yet. On the framebuffer console, keys typed during a checkpoint can be lost (<a href="https://github.com/blancolioni/rose/issues/795">#795</a>); boot “text mode” if that gets in the way.</p>
     </div>
   </section>
 
