@@ -65,10 +65,11 @@ def gh_api(path, paginate=False):
 
 
 def version_key(title):
-    """(0, 3, 0) for "0.3.0"; None for a milestone that is not a version."""
+    """(0, 4, 0) for "0.4.0" or "0.4.0 genki"; None for a milestone
+    that is not a version."""
     try:
-        return tuple(int(part) for part in title.split("."))
-    except ValueError:
+        return tuple(int(part) for part in title.split()[0].split("."))
+    except (ValueError, IndexError):
         return None
 
 
