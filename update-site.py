@@ -48,6 +48,9 @@ ISO = "/var/www/rose-os.org/html/rose.iso"
 # version, such as 0.2.0, which goes on the download button before
 # its size.
 ISO_VERSION = ISO + ".version"
+# Published each night by nightly-build.sh, which points rose-latest.iso
+# at the newest of the ISOs there, rose-DATE-COMMIT.iso.
+NIGHTLY_LATEST = "/var/www/rose-os.org/html/nightly/rose-latest.iso"
 
 
 def gh_api(path, paginate=False):
@@ -162,6 +165,22 @@ def day(when):
     return f"{when.day} {when:%b %Y}"
 
 
+def nightly_link():
+    """The line under the download that links the latest nightly ISO,
+    with its date and commit, and the directory of them, or "" if there
+    is none."""
+    if not os.path.exists(NIGHTLY_LATEST):
+        return ""
+    name = os.path.basename(os.path.realpath(NIGHTLY_LATEST))
+    match = re.fullmatch(r"rose-(\d{4}-\d{2}-\d{2})-([0-9a-f]+)\.iso", name)
+    if not match:
+        return ""
+    built = datetime.date.fromisoformat(match.group(1))
+    return (f'Nightly build: <a href="/nightly/rose-latest.iso">'
+            f'{day(built)}, {html.escape(match.group(2))}</a>'
+            f' · <a href="/nightly/">all nightly builds</a>')
+
+
 def render_issue(issue):
     return (f'          <li><a class="issue" '
             f'href="{html.escape(issue["html_url"])}">'
@@ -238,6 +257,7 @@ def main():
         if version:
             page = fill(page, "isoversion",
                         f"{html.escape(version)} · ")
+    page = fill(page, "nightly", nightly_link())
 
     os.makedirs(args.outdir, exist_ok=True)
     if args.fragment:

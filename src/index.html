@@ -150,6 +150,8 @@ p { margin: 0; }
 .disc small { font-family: var(--mono); font-size: 0.75rem; opacity: 0.75; }
 .disc:hover { color: var(--rose); }
 .disc:hover img { filter: brightness(1.04); }
+.nightly { font-family: var(--mono); font-size: 0.75rem; opacity: 0.75; margin: 0.5rem 0 0; }
+.nightly:empty { display: none; }
 
 /* Specimen plate */
 .plate {
@@ -276,6 +278,7 @@ footer {
         <img src="rose-disc.webp" width="320" height="308" alt="A CD-ROM printed with the Rose logo and a red rose, labelled Bootable Installation CD-ROM">
         <span>Download the installation CD image <small><!-- isoversion:start --><!-- isoversion:end --><!-- isosize:start -->34 MB<!-- isosize:end --></small></span>
       </a>
+      <p class="nightly"><!-- nightly:start --><!-- nightly:end --></p>
     </div>
 
     <figure class="plate">
