@@ -1,0 +1,13 @@
+[Unit]
+Description=Build and test Rose from the main branches, and publish its ISO
+After=network-online.target
+
+[Service]
+Type=oneshot
+# alr is in ~/bin
+Environment=PATH=%h/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=%h/rose-site/nightly-build.sh
+# The build and the log tests take about four hours on two processors;
+# a build that hangs is stopped well before the next night's.
+TimeoutStartSec=12h
+Nice=10
