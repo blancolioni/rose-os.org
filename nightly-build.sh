@@ -10,8 +10,8 @@
 #      moved since the last night's build, whether that passed or not;
 #   2. builds idle with alr, and Rose with clean-build.sh;
 #   3. runs scripts/test-boot, then the checkpoint log's tests,
-#      test-log-wrap, test-log-clean and test-log-crash, each that the
-#      Rose being built has, one after the other;
+#      test-log-wrap, test-log-clean, test-log-crash and test-log-full,
+#      each that the Rose being built has, one after the other;
 #   4. if all of them passed, copies images/rose.iso to
 #      rose-DATE-COMMIT.iso, with a .txt file that names the three
 #      commits, points rose-latest.iso at it, and updates SHA256SUMS;
@@ -30,7 +30,8 @@ NIGHTLY=${NIGHTLY:-$HOME/nightly}
 OUT=${OUT:-/var/www/rose-os.org/html/nightly}
 LOGS=${LOGS:-$HOME/scratch/nightly}
 KEEP=7
-TESTS=${NIGHTLY_TESTS:-test-boot test-log-wrap test-log-clean test-log-crash}
+TESTS=${NIGHTLY_TESTS:-test-boot test-log-wrap test-log-clean test-log-crash
+       test-log-full}
 
 today=$(date -u +%F)
 log_dir=$LOGS/$today
