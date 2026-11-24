@@ -6,8 +6,8 @@
 # branches, worktrees and the idle in ~/bin never reach a nightly build.
 # Each night it:
 #
-#   1. fetches the three repositories, and stops if none of them has
-#      moved since the last night's build, whether that passed or not;
+#   1. fetches the three repositories, with their tags, and stops if
+#      none of them has moved since the last build that passed;
 #   2. builds idle with alr, and Rose with clean-build.sh;
 #   3. runs scripts/test-boot, then the checkpoint log's tests,
 #      test-log-wrap, test-log-clean, test-log-crash and test-log-full,
@@ -72,7 +72,10 @@ for repo in rose syn idle; do
         git clone -q "https://github.com/blancolioni/$repo.git" \
             "$NIGHTLY/$repo" || failed "cloning $repo"
     fi
-    git -C "$NIGHTLY/$repo" fetch -q origin main || failed "fetching $repo"
+    # --tags: a fetch that names a branch brings no tags, and Rose's
+    # build checks endpoint ids against its series' release tag.
+    git -C "$NIGHTLY/$repo" fetch -q --tags origin main \
+        || failed "fetching $repo"
     git -C "$NIGHTLY/$repo" reset -q --hard origin/main
     git -C "$NIGHTLY/$repo" clean -q -f -d -x
 done
@@ -85,7 +88,6 @@ if [ "${NIGHTLY_FORCE:-0}" != 1 ] \
     say "nothing has moved since the last build"
     exit 0
 fi
-echo "$heads" > "$NIGHTLY/.built"
 
 say "building idle"
 (cd "$NIGHTLY/idle" && alr -n build) > "$log_dir/idle.log" 2>&1 \
@@ -146,6 +148,9 @@ ls "$OUT" | grep -E '^rose-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9a-f]+\.iso$' \
      && chmod 644 .SHA256SUMS.new \
      && mv -f .SHA256SUMS.new SHA256SUMS)
 
+# Only a build that passed counts: after a failure, the next night
+# tries again even if nothing has moved.
+echo "$heads" > "$NIGHTLY/.built"
 status "passed; published $name.iso"
 say "published $name.iso"
 
