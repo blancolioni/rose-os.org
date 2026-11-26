@@ -11,14 +11,19 @@
 #   2. builds idle with alr, and Rose with clean-build.sh;
 #   3. runs scripts/test-boot, then the checkpoint log's tests,
 #      test-log-wrap, test-log-clean, test-log-crash and test-log-full,
-#      each that the Rose being built has, one after the other;
-#   4. if all of them passed, copies images/rose.iso to
+#      each that the Rose being built has, one after the other, and then
+#      test-update-repeat, which updates an installation again and
+#      again, and so needs a second ISO whose programs differ: it builds
+#      that from the same tree with an uncommitted change, which changes
+#      login's build id;
+#   4. if all of them passed, copies the ISO built in step 2 to
 #      rose-DATE-COMMIT.iso, with a .txt file that names the three
 #      commits, points rose-latest.iso at it, and updates SHA256SUMS;
 #   5. keeps the last seven nightly ISOs, and the first of each month.
 #
 # status.txt says how the last night went, whether or not it published
-# an ISO.  The logs are in ~/scratch/nightly/DATE, for a week.
+# an ISO.  The logs are in ~/scratch/nightly/DATE, for a week, with the
+# two ISOs if a test failed.
 #
 # NIGHTLY, OUT and LOGS can be set in the environment, for testing; with
 # NIGHTLY_FORCE=1 it builds even if nothing has moved, and NIGHTLY_TESTS
@@ -31,7 +36,7 @@ OUT=${OUT:-/var/www/rose-os.org/html/nightly}
 LOGS=${LOGS:-$HOME/scratch/nightly}
 KEEP=7
 TESTS=${NIGHTLY_TESTS:-test-boot test-log-wrap test-log-clean test-log-crash
-       test-log-full}
+       test-log-full test-update-repeat}
 
 today=$(date -u +%F)
 log_dir=$LOGS/$today
@@ -99,13 +104,39 @@ say "building Rose"
     > "$log_dir/build.log" 2>&1 \
     || failed "building Rose"
 
+# The ISO that is published.  images/rose.iso doesn't stay this build's:
+# test-update-repeat's second ISO replaces it.
+iso=$log_dir/rose.iso
+cp "$NIGHTLY/rose/images/rose.iso" "$iso"
+
+# second_iso: build the ISO that test-update-repeat updates to and from,
+# in $log_dir/rose-dirty.iso.  An uncommitted change in the tree makes
+# the build id "COMMIT-dirty", so login, which shows it, differs.
+second_iso () {
+    say "building a second ISO for test-update-repeat"
+    echo >> "$NIGHTLY/rose/README.md"
+    (cd "$NIGHTLY/rose" \
+         && IDLE=$NIGHTLY/idle/bin/idle make -j"${JOBS:-2}") \
+        > "$log_dir/build-dirty.log" 2>&1 \
+        || failed "building the second ISO"
+    git -C "$NIGHTLY/rose" checkout -q -- README.md
+    cp "$NIGHTLY/rose/images/rose.iso" "$log_dir/rose-dirty.iso"
+}
+
 passed=""
 for test in $TESTS; do
     [ -f "$NIGHTLY/rose/scripts/$test" ] || continue
+    args=""
+    if [ "$test" = test-update-repeat ]; then
+        second_iso
+        args="$iso $log_dir/rose-dirty.iso"
+    fi
     say "running $test"
     rm -rf "${log_dir:?}/$test"
     mkdir -p "$log_dir/$test"
-    (cd "$NIGHTLY/rose" && ROSE_TEST_DIR=$log_dir/$test sh "scripts/$test") \
+    # shellcheck disable=SC2086 # args is word-split on purpose
+    (cd "$NIGHTLY/rose" \
+         && ROSE_TEST_DIR=$log_dir/$test sh "scripts/$test" $args) \
         > "$log_dir/$test.log" 2>&1 \
         || failed "$test"
     passed="$passed $test"
@@ -116,7 +147,7 @@ done
 
 commit=$(git -C "$NIGHTLY/rose" rev-parse --short=7 HEAD)
 name=rose-$today-$commit
-cp "$NIGHTLY/rose/images/rose.iso" "$OUT/.$name.iso.new"
+cp "$iso" "$OUT/.$name.iso.new"
 chmod 644 "$OUT/.$name.iso.new"
 mv -f "$OUT/.$name.iso.new" "$OUT/$name.iso"
 {
@@ -153,6 +184,7 @@ ls "$OUT" | grep -E '^rose-[0-9]{4}-[0-9]{2}-[0-9]{2}-[0-9a-f]+\.iso$' \
 echo "$heads" > "$NIGHTLY/.built"
 status "passed; published $name.iso"
 say "published $name.iso"
+rm -f "$iso" "$log_dir/rose-dirty.iso"
 
 # A week of logs; a test's directory is empty after it passes.
 find "$LOGS" -mindepth 1 -maxdepth 1 -type d -mtime +7 -exec rm -rf {} +
