@@ -15,7 +15,8 @@
 #      test-update-repeat, which updates an installation again and
 #      again, and so needs a second ISO whose programs differ: it builds
 #      that from the same tree with an uncommitted change, which changes
-#      login's build id;
+#      login's build id; and then test-bochs, which installs and tests
+#      Rose under Bochs, a second emulator, and takes half an hour;
 #   4. if all of them passed, copies the ISO built in step 2 to
 #      rose-DATE-COMMIT.iso, with a .txt file that names the three
 #      commits, points rose-latest.iso at it, and updates SHA256SUMS;
@@ -36,7 +37,7 @@ OUT=${OUT:-/var/www/rose-os.org/html/nightly}
 LOGS=${LOGS:-$HOME/scratch/nightly}
 KEEP=7
 TESTS=${NIGHTLY_TESTS:-test-boot test-log-wrap test-log-clean test-log-crash
-       test-log-full test-update-repeat}
+       test-log-full test-update-repeat test-bochs}
 
 today=$(date -u +%F)
 log_dir=$LOGS/$today
@@ -130,6 +131,9 @@ for test in $TESTS; do
     if [ "$test" = test-update-repeat ]; then
         second_iso
         args="$iso $log_dir/rose-dirty.iso"
+    elif [ "$test" = test-bochs ]; then
+        # images/rose.iso is test-update-repeat's second ISO by now
+        args=$iso
     fi
     say "running $test"
     rm -rf "${log_dir:?}/$test"

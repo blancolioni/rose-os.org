@@ -8,7 +8,7 @@ The landing page for [Rose](https://github.com/blancolioni/rose), a persistent, 
 - `src/rose.jpg`: the rose photo, from `icons/rose-small.png` in the Rose repository.
 - `src/rose-disc.webp`: the label art for the installation CD-ROM, the link to the ISO download, with its version and size beside it; 320 px wide, with a transparent background.
 - `update-site.py`: fills in the "Recently merged" list with the last five pull requests merged into blancolioni/rose, the ISO download link with the version and size of the published ISO (`rose.iso.version`, written by `make publish-iso`), and the link to the latest nightly build, and writes `index.html` and `rose.jpg` to the web root.
-- `nightly-build.sh`: keeps its own clones of rose, syn and idle in `~/nightly`, tracking `main`. Each night that any of them has moved, it builds idle and Rose, runs `test-boot` and the checkpoint log's tests (`test-log-wrap`, `test-log-clean`, `test-log-crash`, `test-log-full`), then `test-update-repeat` with a second ISO built from the same tree with an uncommitted change, and if they all pass, publishes the ISO to `/nightly/` as `rose-DATE-COMMIT.iso`, with a `.txt` naming the three commits, `rose-latest.iso` pointing at it, and `SHA256SUMS`. It keeps the last seven, and the first of each month. `status.txt` says how the last night went; the logs are in `~/scratch/nightly/DATE` for a week.
+- `nightly-build.sh`: keeps its own clones of rose, syn and idle in `~/nightly`, tracking `main`. Each night that any of them has moved, it builds idle and Rose, runs `test-boot` and the checkpoint log's tests (`test-log-wrap`, `test-log-clean`, `test-log-crash`, `test-log-full`), then `test-update-repeat` with a second ISO built from the same tree with an uncommitted change, then `test-bochs`, which installs and tests the ISO under Bochs, and if they all pass, publishes the ISO to `/nightly/` as `rose-DATE-COMMIT.iso`, with a `.txt` naming the three commits, `rose-latest.iso` pointing at it, and `SHA256SUMS`. It keeps the last seven, and the first of each month. `status.txt` says how the last night went; the logs are in `~/scratch/nightly/DATE` for a week.
 - `update-book.sh`: keeps its own clone of Rose at `~/rose-book-src`, tracking `main`. When `main` has moved, it builds the Rose Book (`make adoc` in `doc/rose-book`) and publishes the HTML, PDF and EPUB to `/rose-book/`. Branches and worktrees never reach the website.
 - `update-stats.sh`: builds a visitor report with GoAccess from `/var/log/nginx/rose-os.org.log` and its rotated copies, and writes it to `~/rose-stats/index.html`, outside the web root. IP addresses are anonymised; crawlers, 404s and query strings are left out.
 - `systemd/`: user services and timers that run the generator and the book updater every 15 minutes, the stats report every hour, and the nightly build at 00:30 UTC.
@@ -47,7 +47,7 @@ systemctl --user daemon-reload
 systemctl --user enable --now rose-book.timer
 ```
 
-The nightly build's timer is installed the same way. It needs what building and testing Rose needs (see Rose's README): `alr` in `~/bin`, GNAT, `qemu-system-x86`, `xorriso` and the GRUB tools. Its directory has to exist, be writable by the user, and be listed by nginx, with a block like this in the site's server block:
+The nightly build's timer is installed the same way. It needs what building and testing Rose needs (see Rose's README): `alr` in `~/bin`, GNAT, `qemu-system-x86`, `bochs` (with its `term` display), `xorriso` and the GRUB tools. Its directory has to exist, be writable by the user, and be listed by nginx, with a block like this in the site's server block:
 
 ```nginx
 location /nightly/ {
@@ -68,7 +68,7 @@ systemctl --user daemon-reload
 systemctl --user enable --now rose-nightly.timer
 ```
 
-The first run clones the three repositories. A build and the tests take about four hours on two processors; `NIGHTLY_FORCE=1 ./nightly-build.sh` builds at once, even if nothing has moved.
+The first run clones the three repositories. A build and the tests take about four and a half hours on two processors; `NIGHTLY_FORCE=1 ./nightly-build.sh` builds at once, even if nothing has moved.
 
 The stats timer needs `goaccess`, and read access to `/var/log/nginx`: the user must be in the group that owns the logs (`weblogs`), and `/etc/logrotate.d/nginx` must create new logs with that group (`create 0640 nginx weblogs`). nginx writes the site's own log, set in its server block with `access_log /var/log/nginx/rose-os.org.log main;`.
 
