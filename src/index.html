@@ -342,30 +342,30 @@ footer {
       </blockquote>
       <div class="work">
         <div class="work-head">
-          <h3>In <a href="https://github.com/blancolioni/rose/releases/tag/v0.4.0">0.4.0, genki</a></h3>
-          <p class="goal">The release whose checkpoints last: an installation restores on every later 0.4.x, and is upgraded in place.</p>
-          <span class="meta">Released 23 Nov 2026</span>
+          <h3>In <a href="https://github.com/blancolioni/rose/releases/tag/v0.4.1">0.4.1, genki</a></h3>
+          <p class="goal">The release 0.4 freezes at. It can’t restore a 0.4.0 installation: install it again.</p>
+          <span class="meta">Released 28 Nov 2026</span>
         </div>
         <ul>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/833">#833</a><span>An “Update Rose” boot entry upgrades an installation, and replaces running servers with their new versions</span></li>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/935">#935</a><span>A stable checkpoint and storage format, and interfaces whose endpoint ids only grow within a series</span></li>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/765">#765</a><span>Changed memory is paged out to the checkpoint log, so it no longer has to fit in RAM</span></li>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/356">#356</a><span>The checkpoint log cleans itself and wraps around</span></li>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/750">#750</a><span>Banks: every process’s storage is charged to its owner, and ends with it</span></li>
-          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/512">#512</a><span>A console supervisor: nothing asks for a login until the installed system has restarted</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/1138">#1138</a><span>The 0.4 series freezes here: an installation made from 0.4.1 restores on every later 0.4.x</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/1160">#1160</a><span>Pages are copied before they’re written during a checkpoint, so processes keep running and typed keys aren’t lost</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/1174">#1174</a><span>The kernel’s and the memory server’s parts of a checkpoint describe the same moment</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/913">#913</a><span>Room for 80 processes, up from 64</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/1132">#1132</a><span>Passwords stay off the disk: what is typed at the console is never saved in a checkpoint</span></li>
+          <li><a class="issue" href="https://github.com/blancolioni/rose/issues/1096">#1096</a><span>Petal names directories as URI references, such as //home/docs</span></li>
         </ul>
       </div>
       <div class="work">
         <div class="work-head">
           <h3>Recently resolved<!-- milestone:start --><!-- milestone:end --></h3>
-          <p class="goal">0.4.1: fixes for 0.4.0, and what didn’t make it in, such as 256 processes and keys lost during a checkpoint.</p>
+          <p class="goal">0.5.0, max: networking, a display server with a mouse pointer and windows, typed streams, and updates from 0.4.</p>
           <span class="meta"><!-- progress:start --><!-- progress:end --><!-- updated:start -->Not yet updated<!-- updated:end --></span>
         </div>
         <ul>
           <!-- resolved:start --><!-- resolved:end -->
         </ul>
       </div>
-      <p class="gaps"><span class="label">Known gaps</span> No networking yet. On the framebuffer console, keys typed during a checkpoint can be lost (<a href="https://github.com/blancolioni/rose/issues/795">#795</a>); boot “text mode” if that gets in the way.</p>
+      <p class="gaps"><span class="label">Known gaps</span> No networking yet. The kernel has room for 80 processes (<a href="https://github.com/blancolioni/rose/issues/1161">#1161</a>).</p>
     </div>
   </section>
 
