@@ -3,8 +3,8 @@
 
 Fills the "Recently resolved" list in src/index.html with the issues
 last closed as completed in the current milestone of blancolioni/rose
-(the open milestone with the lowest version), with its progress, and
-the download button with the version and size of the published ISO,
+(the open milestone with the lowest version), with its progress and
+its goal (the milestone's description), and the download button with the version and size of the published ISO,
 then writes the
 page, its image and its icons to OUTDIR.  It also writes feed.xml
 there, an Atom feed of the pull requests last merged into main.  src/index.html is a page
@@ -83,6 +83,21 @@ def current_milestone():
                   if version_key(m["title"])]
     return min(milestones, key=lambda m: version_key(m["title"]),
                default=None)
+
+
+def milestone_goal(milestone):
+    """The milestone's description, as "0.5.0, max: ...", without the
+    sentence about whom the release is named after; None if nothing is
+    left."""
+    sentences = re.split(r"(?<=\.)\s+", (milestone.get("description") or "")
+                         .strip())
+    goal = " ".join(s for s in sentences
+                    if s and not s.startswith("Named after"))
+    if not goal:
+        return None
+    version, _, name = milestone["title"].partition(" ")
+    label = f"{version}, {name.strip()}" if name.strip() else version
+    return f"{label}: {goal[0].lower()}{goal[1:]}"
 
 
 def milestone_issues(milestone):
@@ -245,6 +260,9 @@ def main():
                     f' for <a href="{html.escape(milestone["html_url"])}">'
                     f'{html.escape(milestone["title"])}</a>')
         page = fill(page, "progress", f"{done} of {total} done · ")
+        goal = milestone_goal(milestone)
+        if goal:
+            page = fill(page, "goal", html.escape(goal))
         items = "".join(render_issue(i) for i in resolved_issues(issues))
         page = fill(page, "resolved", "\n" + items + "          ")
     page = fill(page, "updated", f"Updated {day(now)}, {now:%H:%M} UTC")
